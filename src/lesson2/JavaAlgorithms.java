@@ -3,7 +3,9 @@ package lesson2;
 import kotlin.NotImplementedError;
 import kotlin.Pair;
 
-import java.util.Set;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
 
 @SuppressWarnings("unused")
 public class JavaAlgorithms {
@@ -99,8 +101,23 @@ public class JavaAlgorithms {
      * Если имеется несколько самых длинных общих подстрок одной длины,
      * вернуть ту из них, которая встречается раньше в строке first.
      */
-    static public String longestCommonSubstring(String firs, String second) {
-        throw new NotImplementedError();
+    static public String longestCommonSubstring(String first, String second) {
+        int startInd = 0, endInd = 0;
+        int fLen = first.length(), sLen = second.length();
+        for (int i = 0; i < fLen; i++) {
+            for (int j = 0; j < sLen; j++) {
+                int x = 0;
+                while (first.charAt(i + x) == second.charAt(j + x)) {
+                    x++;
+                    if (((i + x) >= fLen) || ((j + x) >= sLen)) break;
+                }
+                if (x > endInd) {
+                    endInd = x;
+                    startInd = i;
+                }
+            }
+        }
+        return first.substring(startInd, (startInd + endInd));
     }
 
     /**
@@ -143,7 +160,52 @@ public class JavaAlgorithms {
      * В файле буквы разделены пробелами, строки -- переносами строк.
      * Остальные символы ни в файле, ни в словах не допускаются.
      */
-    static public Set<String> baldaSearcher(String inputName, Set<String> words) {
-        throw new NotImplementedError();
+    static public Set<String> baldaSearcher(String inputName, Set<String> words) throws IOException {
+        Set<String> answer = new HashSet<>();
+        Scanner input = new Scanner(new File(inputName));
+        int numRows = 0, numColumns = 0;
+        while (input.hasNextLine()) {
+            numRows++;
+            numColumns = input.nextLine().replaceAll(" ", "").length();
+        }
+        input.close();
+        input = new Scanner(new File(inputName));
+        char[][] arrayChar = new char[numRows][numColumns];
+        for(int row = 0; row < numRows; row++) {
+            String strings = input.nextLine().replaceAll(" ", "");
+            for(int column = 0; column < numColumns; column++) arrayChar[row][column] = strings.charAt(column);
+        }
+        for (int row = 0; row < numRows; row++) {
+            for (int col = 0; col < numColumns; col++) {
+                for (String word : words) {
+                    if (arrayChar[row][col] != word.charAt(0)) continue;
+                    javafx.util.Pair<Integer, Integer> pairCoord = new javafx.util.Pair<>(row, col);
+                    if (find(arrayChar, numColumns, numRows, word, 1, pairCoord, new HashSet<>())) answer.add(word);
+                }
+            }
+        }
+        return answer;
+    }
+    private static boolean find(char[][] arrayChar, int numColumns, int numRows, String word, int k, javafx.util.Pair<Integer, Integer> coord, Set<javafx.util.Pair> oldCord) {
+        int[] x = { -1, 0, 0, 1 };
+        int[] y = { 0, -1, 1, 0 };
+        List<javafx.util.Pair> list = new ArrayList<>();
+        int rd;
+        int cd;
+        for (int dir = 0; dir < 4; dir++) {
+            rd = coord.getKey() + x[dir];
+            cd = coord.getValue() + y[dir];
+            if (rd >= numRows || rd < 0 || cd >= numColumns || cd < 0) continue;
+            if (arrayChar[rd][cd] == word.charAt(k)) {
+                javafx.util.Pair<Integer, Integer> pairCoord = new javafx.util.Pair<>(rd, cd);
+                if (!oldCord.contains(pairCoord)) list.add(pairCoord);
+            }
+        }
+        oldCord.add(coord);
+        for (javafx.util.Pair cord : list) {
+            if (k + 1 == word.length()) return true;
+            if (find(arrayChar, numColumns, numRows, word, k + 1, cord, oldCord)) return true;
+        }
+        return false;
     }
 }

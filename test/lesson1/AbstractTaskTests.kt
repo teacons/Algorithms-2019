@@ -1,6 +1,7 @@
 package lesson1
 
 import org.junit.jupiter.api.Assertions.assertArrayEquals
+import org.junit.jupiter.api.Assertions.assertThrows
 import util.PerfResult
 import util.estimate
 import java.io.BufferedWriter
@@ -73,6 +74,28 @@ abstract class AbstractTaskTests : AbstractFileTests() {
         } finally {
             File("temp.txt").delete()
         }
+        try {
+            assertThrows(IllegalArgumentException::class.java) {
+                sortAddresses(
+                    "input/addr_in_throws_1.txt",
+                    "temp.txt"
+                )
+            }
+            assertThrows(IllegalArgumentException::class.java) {
+                sortAddresses(
+                    "input/addr_in_throws_2.txt",
+                    "temp.txt"
+                )
+            }
+            assertThrows(IllegalArgumentException::class.java) {
+                sortAddresses(
+                    "input/addr_in_throws_3.txt",
+                    "temp.txt"
+                )
+            }
+        } finally {
+            File("temp.txt").delete()
+        }
     }
 
     private fun generateTemperatures(size: Int): PerfResult<Unit> {
@@ -115,6 +138,16 @@ abstract class AbstractTaskTests : AbstractFileTests() {
                     121.3
                 """.trimIndent()
             )
+        } finally {
+            File("temp.txt").delete()
+        }
+        try {
+            assertThrows(IllegalArgumentException::class.java) {
+                sortTemperatures("input/temp_in_throws_1.txt", "temp.txt")
+            }
+            assertThrows(IllegalArgumentException::class.java) {
+                sortTemperatures("input/temp_in_throws_2.txt", "temp.txt")
+            }
         } finally {
             File("temp.txt").delete()
         }

@@ -2,6 +2,11 @@ package lesson1;
 
 import kotlin.NotImplementedError;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.*;
+
 @SuppressWarnings("unused")
 public class JavaTasks {
     /**
@@ -64,8 +69,38 @@ public class JavaTasks {
      *
      * В случае обнаружения неверного формата файла бросить любое исключение.
      */
-    static public void sortAddresses(String inputName, String outputName) {
-        throw new NotImplementedError();
+    static public void sortAddresses(String inputName, String outputName) throws IOException {
+        TreeMap<String, TreeMap<Integer, List<String>>> addrBook = new TreeMap<>();
+        Scanner in = new Scanner(new File(inputName));
+        while (in.hasNextLine()) {
+            List<String> lines = new ArrayList<>();
+            List<String> names = new ArrayList<>();
+            TreeMap<Integer, List<String>> temp = new TreeMap<>();
+            List<String> temp3 = new ArrayList<>();
+            List<String> temp2 = new ArrayList<>();
+            Collections.addAll(lines, in.nextLine().split(" - "));
+            if (lines.size() != 2) throw new IllegalArgumentException();
+            if (lines.get(0).matches(".+[0-9]+")) throw new IllegalArgumentException();
+            Collections.addAll(names, lines.get(0).split(" "));
+            if (names.size() != 2) throw new IllegalArgumentException();
+            Collections.addAll(temp2, lines.get(1).split(" "));
+            if (addrBook.get(temp2.get(0)) != null) {
+                temp = addrBook.get(temp2.get(0));
+                if (temp.get(Integer.parseInt(temp2.get(1))) != null) temp3 = temp.get(Integer.parseInt(temp2.get(1)));
+            }
+            temp3.add(lines.get(0));
+            temp.put(Integer.parseInt(temp2.get(1)), temp3);
+            Collections.sort(temp3);
+            if (addrBook.get(temp2.get(0)) != null) addrBook.replace(lines.get(1), temp);
+            else addrBook.put(temp2.get(0), temp);
+        }
+        try (FileWriter writer = new FileWriter(outputName)) {
+            for (Map.Entry<String, TreeMap<Integer, List<String>>> item : addrBook.entrySet()){
+                String addr = item.getKey();
+                for (Map.Entry<Integer, List<String>> item2 : item.getValue().entrySet())
+                    writer.write(String.format("%s %s - %s\n", addr, item2.getKey().toString(), item2.getValue().toString().replaceAll("[\\[\\]]", "")));
+            }
+        }
     }
 
     /**
@@ -98,9 +133,20 @@ public class JavaTasks {
      * 99.5
      * 121.3
      */
-    static public void sortTemperatures(String inputName, String outputName) {
-        throw new NotImplementedError();
+    static public void sortTemperatures(String inputName, String outputName) throws IOException {
+        List<Double> list = new ArrayList<>();
+        Scanner in = new Scanner(new File(inputName));
+        while (in.hasNextLine()) {
+            Double temp = Double.parseDouble(in.nextLine());
+            if (temp > 500.0 || temp < -273.0) throw new IllegalArgumentException();
+            list.add(temp);
+        }
+        Collections.sort(list);
+        try (FileWriter writer = new FileWriter(outputName)) {
+            for (Double element : list) writer.write(element.toString() + "\n");
+        }
     }
+
 
     /**
      * Сортировка последовательности
