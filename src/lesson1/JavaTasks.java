@@ -69,6 +69,8 @@ public class JavaTasks {
      *
      * В случае обнаружения неверного формата файла бросить любое исключение.
      */
+    // O(N^2)-трудоёмкость
+    // O(N)-ресурсоемкость
     static public void sortAddresses(String inputName, String outputName) throws IOException {
         TreeMap<String, TreeMap<Integer, List<String>>> addrBook = new TreeMap<>();
         Scanner in = new Scanner(new File(inputName));
@@ -133,6 +135,8 @@ public class JavaTasks {
      * 99.5
      * 121.3
      */
+    // O(N)-трудоёмкость
+    // O(N)-ресурсоемкость
     static public void sortTemperatures(String inputName, String outputName) throws IOException {
         List<Double> list = new ArrayList<>();
         Scanner in = new Scanner(new File(inputName));

@@ -75,6 +75,8 @@ abstract class AbstractAlgorithmsTests {
 
     fun longestCommonSubstring(longestCommonSubstring: (String, String) -> String) {
         assertEquals("", longestCommonSubstring("мой мир", "я"))
+        assertEquals("", longestCommonSubstring("", ""))
+        assertEquals("どうも", longestCommonSubstring("どうも", "どうもありがとう"))
         assertEquals("зд", longestCommonSubstring("здравствуй мир", "мы здесь"))
         assertEquals("СЕРВАТОР", longestCommonSubstring("ОБСЕРВАТОРИЯ", "КОНСЕРВАТОРЫ"))
         assertEquals(
@@ -169,6 +171,10 @@ abstract class AbstractAlgorithmsTests {
                     "АППРОКСИМАЦИЯ", "ИНТЕРПОЛЯЦИЯ", "МАЙЕВТИКА", "ШРЕДИНГЕР", "ЭЙНШТЕЙН"
                 )
             )
+        )
+        assertEquals(
+            setOf("КРАН", "АКВА", "НАРТЫ"),
+            baldaSearcher("input/balda_in4.txt", setOf("ТРАВА", "КРАН", "АКВА", "НАРТЫ", "РАК"))
         )
     }
 }

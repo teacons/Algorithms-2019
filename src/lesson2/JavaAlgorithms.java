@@ -101,6 +101,8 @@ public class JavaAlgorithms {
      * Если имеется несколько самых длинных общих подстрок одной длины,
      * вернуть ту из них, которая встречается раньше в строке first.
      */
+    // O(N^3)-трудоёмкость
+    // O(N)-ресурсоемкость
     static public String longestCommonSubstring(String first, String second) {
         int startInd = 0, endInd = 0;
         int fLen = first.length(), sLen = second.length();
@@ -160,6 +162,8 @@ public class JavaAlgorithms {
      * В файле буквы разделены пробелами, строки -- переносами строк.
      * Остальные символы ни в файле, ни в словах не допускаются.
      */
+    // O(N*M*H)-трудоёмкость, N*M - размер матрицы, H-количество слов
+    // O(N*M+H)-ресурсоёмкость
     static public Set<String> baldaSearcher(String inputName, Set<String> words) throws IOException {
         Set<String> answer = new HashSet<>();
         Scanner input = new Scanner(new File(inputName));
@@ -186,10 +190,11 @@ public class JavaAlgorithms {
         }
         return answer;
     }
-    private static boolean find(char[][] arrayChar, int numColumns, int numRows, String word, int k, javafx.util.Pair<Integer, Integer> coord, Set<javafx.util.Pair> oldCord) {
+    private static boolean find(char[][] arrayChar, int numColumns, int numRows, String word, int k,
+                                javafx.util.Pair<Integer, Integer> coord, Set<javafx.util.Pair<Integer, Integer>> oldCord) {
         int[] x = { -1, 0, 0, 1 };
         int[] y = { 0, -1, 1, 0 };
-        List<javafx.util.Pair> list = new ArrayList<>();
+        List<javafx.util.Pair<Integer, Integer>> list = new ArrayList<>();
         int rd;
         int cd;
         for (int dir = 0; dir < 4; dir++) {
@@ -202,7 +207,7 @@ public class JavaAlgorithms {
             }
         }
         oldCord.add(coord);
-        for (javafx.util.Pair cord : list) {
+        for (javafx.util.Pair<Integer, Integer> cord : list) {
             if (k + 1 == word.length()) return true;
             if (find(arrayChar, numColumns, numRows, word, k + 1, cord, oldCord)) return true;
         }
