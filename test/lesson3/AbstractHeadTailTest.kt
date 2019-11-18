@@ -1,7 +1,10 @@
 package lesson3
 
 import java.util.*
-import kotlin.test.*
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 abstract class AbstractHeadTailTest {
     private lateinit var tree: SortedSet<Int>
@@ -46,6 +49,7 @@ abstract class AbstractHeadTailTest {
         assertEquals(false, set.contains(8))
         assertEquals(false, set.contains(9))
         assertEquals(false, set.contains(10))
+        assertEquals(false, set.contains(11))
 
 
         set = tree.headSet(127)
@@ -66,6 +70,7 @@ abstract class AbstractHeadTailTest {
         assertEquals(true, set.contains(8))
         assertEquals(true, set.contains(9))
         assertEquals(true, set.contains(10))
+        assertEquals(false, set.contains(11))
 
         set = tree.tailSet(-128)
         for (i in 1..10)

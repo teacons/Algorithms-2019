@@ -1,6 +1,5 @@
 package lesson3;
 
-import kotlin.NotImplementedError;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -11,6 +10,8 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
 
     private static class Node<T> {
         final T value;
+
+        Node<T> parent = null;
 
         Node<T> left = null;
 
@@ -39,10 +40,12 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
         else if (comparison < 0) {
             assert closest.left == null;
             closest.left = newNode;
+            newNode.parent = closest;
         }
         else {
             assert closest.right == null;
             closest.right = newNode;
+            newNode.parent = closest;
         }
         size++;
         return true;
@@ -68,14 +71,52 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
         return 1 + Math.max(height(node.left), height(node.right));
     }
 
+    private Node<T> minimum(Node<T> root) {
+        while (root.left != null) root = root.left;
+        return root;
+    }
+
     /**
      * Удаление элемента в дереве
      * Средняя
+     *
+     * O(lgn) - трудоёмкость
+     * O(1) - ресурсоемкость
+     *
      */
     @Override
+    @SuppressWarnings("unchecked")
     public boolean remove(Object o) {
-        // TODO
-        throw new NotImplementedError();
+        T value = (T) o;
+        Node<T> node = find(value);
+        if (node != null && node.value != value) throw new IllegalArgumentException();
+        return remove(node);
+    }
+
+    private boolean remove(Node<T> node) {
+        if (node == null) return false;
+        if (node.left == null) editTo(node, node.right);
+        else if (node.right == null) editTo(node, node.left);
+        else {
+            Node<T> temp = minimum(node.right);
+            if (temp.parent != node) {
+                editTo(temp, temp.right);
+                temp.right = node.right;
+                temp.right.parent = temp;
+            }
+            editTo(node, temp);
+            temp.left = node.left;
+            temp.left.parent = temp;
+        }
+        size--;
+        return true;
+    }
+
+    private void editTo(Node<T> to, Node<T> from) {
+        if (to.parent == null) root = from;
+        else if (to.equals(to.parent.left)) to.parent.left = from;
+        else to.parent.right = from;
+        if (from != null) from.parent = to.parent;
     }
 
     @Override
@@ -106,40 +147,68 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
         }
     }
 
+    private Node<T> findNext(Node<T> temp) {
+        if (temp == null) return minimum(root);
+        if (temp.right != null) return minimum(temp.right);
+        Node<T> temp2 = temp.parent;
+        while (temp2 != null && temp == temp2.right) {
+            temp = temp2;
+            temp2 = temp2.parent;
+        }
+        return temp2;
+    }
+
     public class BinaryTreeIterator implements Iterator<T> {
 
+        private Node<T> current;
+        private Node<T> prev = null;
+
         private BinaryTreeIterator() {
-            // Добавьте сюда инициализацию, если она необходима
+            if (root == null) current = null;
+            else current = minimum(root);
         }
 
         /**
          * Проверка наличия следующего элемента
          * Средняя
+         *
+         * O(1) - трудоёмкость
+         * O(1) - ресурсоемкость
+         *
          */
         @Override
         public boolean hasNext() {
-            // TODO
-            throw new NotImplementedError();
+            return current != null;
         }
 
         /**
          * Поиск следующего элемента
          * Средняя
+         *
+         * O(lgn) - трудоёмкость
+         * O(1) - ресурсоемкость
+         *
          */
         @Override
         public T next() {
-            // TODO
-            throw new NotImplementedError();
+            prev = current;
+            current = findNext(current);
+            if (prev == null) throw new NoSuchElementException();
+            return prev.value;
         }
 
         /**
          * Удаление следующего элемента
          * Сложная
+         *
+         * O(lgn) - трудоёмкость
+         * O(1) - ресурсоемкость
+         *
          */
         @Override
         public void remove() {
-            // TODO
-            throw new NotImplementedError();
+            BinaryTree.this.remove(prev);
+            prev = null;
         }
     }
 
@@ -164,36 +233,84 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
     /**
      * Для этой задачи нет тестов (есть только заготовка subSetTest), но её тоже можно решить и их написать
      * Очень сложная
+     *
+     * O(1) - трудоёмкость
+     * O(1) - ресурсоемкость
+     *
      */
     @NotNull
     @Override
     public SortedSet<T> subSet(T fromElement, T toElement) {
-        // TODO
-        throw new NotImplementedError();
+       return new Sets(this, fromElement, toElement);
     }
 
     /**
      * Найти множество всех элементов меньше заданного
      * Сложная
+     *
+     * O(1) - трудоёмкость
+     * O(1) - ресурсоемкость
+     *
      */
     @NotNull
     @Override
     public SortedSet<T> headSet(T toElement) {
-        // TODO
-        throw new NotImplementedError();
+        return new Sets(this, null, toElement);
     }
-
     /**
      * Найти множество всех элементов больше или равных заданного
      * Сложная
+     *
+     * O(1) - трудоёмкость
+     * O(1) - ресурсоемкость
+     *
      */
     @NotNull
     @Override
     public SortedSet<T> tailSet(T fromElement) {
-        // TODO
-        throw new NotImplementedError();
+        return new Sets(this, fromElement, null);
     }
 
+    class Sets extends BinaryTree<T> {
+        private final T from, to;
+        private BinaryTree<T> root;
+
+        Sets(BinaryTree<T> root, T from, T to) {
+            this.root = root;
+            this.from = from;
+            this.to = to;
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public boolean contains(Object o) {
+            if (!inRange((T) o)) return false;
+            return root.contains(o);
+        }
+
+        @Override
+        public boolean add(T t) {
+            if (!inRange(t)) throw new IllegalArgumentException();
+            return root.add(t);
+        }
+
+        @Override
+        public int size() {
+            return size(root.root);
+        }
+
+        private int size(Node<T> node) {
+            int size = 0;
+            if (node == null) return size;
+            if (inRange(node.value)) size++;
+            return size + size(node.left) + size(node.right);
+        }
+
+        private boolean inRange(T key) {
+            return (from == null || key.compareTo(from) >= 0) && (to == null || key.compareTo(to) < 0);
+        }
+
+    }
     @Override
     public T first() {
         if (root == null) throw new NoSuchElementException();

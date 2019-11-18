@@ -1,11 +1,8 @@
 package lesson3
 
 import org.junit.jupiter.api.Tag
-import kotlin.test.Test
 import java.util.*
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 class BinaryTreeTest {
     private fun testAdd(create: () -> CheckableSortedSet<Int>) {
@@ -81,6 +78,7 @@ class BinaryTreeTest {
                 binarySet.height() <= originalHeight,
                 "After removal of $toRemove from $list binary tree height increased"
             )
+            assertFailsWith<IllegalArgumentException> { binarySet.remove(1000) }
         }
     }
 
