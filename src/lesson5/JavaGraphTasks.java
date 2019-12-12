@@ -3,6 +3,7 @@ package lesson5;
 import kotlin.NotImplementedError;
 
 import java.util.List;
+import java.util.PriorityQueue;
 import java.util.Set;
 
 @SuppressWarnings("unused")
@@ -118,8 +119,32 @@ public class JavaGraphTasks {
      * J ------------ K
      *
      * Ответ: A, E, J, K, D, C, H, G, B, F, I
+     *
+     *
+     * T(N)=O(V!)-трудоёмкость
+     * R(N)=O(V!)-ресурсоёмкость
      */
     public static Path longestSimplePath(Graph graph) {
-        throw new NotImplementedError();
+        PriorityQueue<Path> queue = new PriorityQueue<>();
+        int length = -1;
+        Path longestPath = new Path();
+        for (Graph.Vertex vertex : graph.getVertices()) {
+            queue.add(new Path(vertex));
+        }
+        while (!queue.isEmpty()) {
+            Path path = queue.poll();
+            List<Graph.Vertex> vertexList = path.getVertices();
+            if (path.getLength() > length) {
+                longestPath = path;
+                length = path.getLength();
+                if (vertexList.size() == graph.getVertices().size()) break;
+            }
+            Set<Graph.Vertex> neighbors = graph.getNeighbors(vertexList.get(vertexList.size()-1));
+            for(Graph.Vertex neighbor : neighbors){
+                if(!path.contains(neighbor)) queue.add(new Path(path, graph, neighbor));
+            }
+        }
+        return longestPath;
     }
+
 }
